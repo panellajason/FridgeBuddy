@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">App</string>
+    <string name="action_gallery">Gallery</string>
+    <string name="permission_request">This app needs to access files on your device</string>
 </resources>
