@@ -1,45 +1,52 @@
-package com.example.app;
+package com.example.app.fragments;
+
+import android.content.Context;
+import android.net.Uri;
+import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Intent;
-import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
+import com.example.app.R;
+import com.example.app.models.Item;
+import com.example.app.models.ItemAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
-public class MainActivity extends AppCompatActivity {
+
+public class ListFragment extends Fragment {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private CollectionReference itemRef = db.collection("Items");
     private ItemAdapter itemAdapter;
+
+    public ListFragment() {}
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        FloatingActionButton buttonAdd = findViewById(R.id.add_item_button);
-        buttonAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, NewItemActivity.class));
-            }
-        });
+        View view = inflater.inflate(R.layout.fragment_list, container, false);
 
-        setUpRecyclerView();
+        setUpRecyclerView(view);
+
+        return view;
     }
 
-    private void setUpRecyclerView() {
+    private void setUpRecyclerView(View view) {
 
-        Query query = itemRef.orderBy("name", Query.Direction.DESCENDING);
+        Query query = itemRef.orderBy("name", Query.Direction.DESCENDING).whereEqualTo("userID", mAuth.getUid());
 
         FirestoreRecyclerOptions<Item> options = new FirestoreRecyclerOptions.Builder<Item>()
                 .setQuery(query, Item.class)
@@ -47,9 +54,9 @@ public class MainActivity extends AppCompatActivity {
 
         itemAdapter = new ItemAdapter(options);
 
-        RecyclerView recView = findViewById(R.id.recycler_view);
+        RecyclerView recView = view.findViewById(R.id.recycler_view);
         recView.setHasFixedSize(true);
-        recView.setLayoutManager(new LinearLayoutManager(this));
+        recView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recView.setAdapter(itemAdapter);
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
@@ -65,18 +72,8 @@ public class MainActivity extends AppCompatActivity {
             }
         }).attachToRecyclerView(recView);
 
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
         itemAdapter.startListening();
 
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        itemAdapter.stopListening();
-    }
 }

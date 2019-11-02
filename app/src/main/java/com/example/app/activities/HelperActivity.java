@@ -1,4 +1,4 @@
-package com.example.app;
+package com.example.app.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -15,13 +15,14 @@ import java.io.File;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.core.app.ActivityCompat;
+
+import com.example.app.models.MyHelper;
+import com.example.app.R;
 
 public class HelperActivity extends AppCompatActivity {
     public static final int RC_STORAGE_PERMS1 = 101;
     public static final int RC_SELECT_PICTURE = 103;
-    public static final String ACTION_BAR_TITLE = "Add Food Item";
     public static File imageFile = null;
 
     @Override
@@ -31,49 +32,16 @@ public class HelperActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-
-//If “gallery_action” is selected, then...//
-
-            case R.id.action_gallery:
-
-//...check we have the WRITE_STORAGE permission//
-
-                checkStoragePermission(RC_STORAGE_PERMS1);
-                break;
-
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case RC_STORAGE_PERMS1:
-
-//If the permission request is granted, then...//
-
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-//...call selectPicture//
-
                     selectPicture();
 
-//If the permission request is denied, then...//
-
                 } else {
-
-//...display the “permission_request” string//
-
                     MyHelper.needPermission(this, requestCode, R.string.permission_request);
                 }
                 break;
@@ -81,26 +49,16 @@ public class HelperActivity extends AppCompatActivity {
         }
     }
 
-//Check whether the user has granted the WRITE_STORAGE permission//
-
     public void checkStoragePermission(int requestCode) {
         switch (requestCode) {
             case RC_STORAGE_PERMS1:
                 int hasWriteExternalStoragePermission = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
-//If we have access to external storage...//
-
                 if (hasWriteExternalStoragePermission == PackageManager.PERMISSION_GRANTED) {
-
-//...call selectPicture, which launches an Activity where the user can select an image//
 
                     selectPicture();
 
-//If permission hasn’t been granted, then...//
-
                 } else {
-
-//...request the permission//
 
                     ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, requestCode);
                 }

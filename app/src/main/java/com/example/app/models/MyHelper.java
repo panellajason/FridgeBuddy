@@ -1,4 +1,4 @@
-package com.example.app;
+package com.example.app.models;
 
 import android.app.Activity;
 import android.app.Dialog;

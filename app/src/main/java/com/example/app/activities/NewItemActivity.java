@@ -1,12 +1,15 @@
-package com.example.app;
+package com.example.app.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -19,8 +22,11 @@ import android.widget.Toast;
 import android.net.Uri;
 
 
+import com.example.app.models.Item;
+import com.example.app.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.ml.vision.FirebaseVision;
@@ -30,6 +36,8 @@ import com.google.firebase.ml.vision.label.FirebaseVisionLabelDetector;
 import com.google.firebase.ml.vision.label.FirebaseVisionLabelDetectorOptions;
 import com.google.firebase.ml.vision.text.FirebaseVisionText;
 import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.util.Calendar;
 import java.util.List;
@@ -46,7 +54,8 @@ public class NewItemActivity extends HelperActivity implements View.OnClickListe
     private RadioGroup radioGroup;
     private Button chooseDateBtn;
     private Button saveBtn;
-
+    private Uri postURI = null;
+    private FirebaseAuth mAuth;
 
 
     @Override
@@ -55,6 +64,8 @@ public class NewItemActivity extends HelperActivity implements View.OnClickListe
         setContentView(R.layout.activity_new_item);
 
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+
+        mAuth = FirebaseAuth.getInstance();
 
         nameET = findViewById(R.id.nameET);
         expDateTV = findViewById(R.id.expdateTV);
@@ -71,6 +82,29 @@ public class NewItemActivity extends HelperActivity implements View.OnClickListe
         findViewById(R.id.saveBtn).setOnClickListener(this);
         findViewById(R.id.chooseDateBtn).setOnClickListener(this);
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.action_gallery:
+                CropImage.activity()
+                        .setGuidelines(CropImageView.Guidelines.ON)
+                        .setMinCropResultSize(512, 512)
+                        .setAspectRatio(1,1)
+                        .start(NewItemActivity.this);
+
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -163,34 +197,26 @@ public class NewItemActivity extends HelperActivity implements View.OnClickListe
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
-        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
 
-        if (resultCode == RESULT_OK) {
-            switch (requestCode) {
-                case RC_STORAGE_PERMS1:
-                    checkStoragePermission(requestCode);
-                    break;
-                case RC_SELECT_PICTURE:
-                    Uri dataUri = data.getData();
-                    String path = MyHelper.getPath(this, dataUri);
-                    if (path == null) {
-                        //mBitmap = MyHelper.resizeImage(imageFile, this, dataUri, mImageView);
-                    } else {
-                        //mBitmap = MyHelper.resizeImage(imageFile, path, mImageView);
-                    }
-                    //if (mBitmap != null) {
-                        nameET.setText(null);
-                        mImageView.setImageURI(dataUri);
-                    //}
-                    mImageView.invalidate();
-                    BitmapDrawable drawable = (BitmapDrawable) mImageView.getDrawable();
-                    mBitmap = drawable.getBitmap();
-                    break;
+            if (resultCode == RESULT_OK) {
 
+                postURI = result.getUri();
+                mImageView.setImageURI(postURI);
+
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
             }
         }
+
+        mImageView.invalidate();
+        BitmapDrawable drawable = (BitmapDrawable) mImageView.getDrawable();
+        mBitmap = drawable.getBitmap();
+
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void saveItem() {
@@ -208,7 +234,7 @@ public class NewItemActivity extends HelperActivity implements View.OnClickListe
 
         CollectionReference itemRef = FirebaseFirestore.getInstance()
                 .collection("Items");
-        itemRef.add(new Item(foodName, expDate));
+        itemRef.add(new Item(foodName, expDate, mAuth.getUid()));
 
         Toast.makeText(getApplicationContext(), "Food Item Saved", Toast.LENGTH_SHORT).show();
         startActivity(new Intent(NewItemActivity.this, MainActivity.class));

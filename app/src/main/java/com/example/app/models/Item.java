@@ -1,15 +1,17 @@
-package com.example.app;
+package com.example.app.models;
 
 public class Item {
 
     private String name;
     private String expdate;
+    private String userID;
 
     public Item(){}
 
-    public Item(String name, String expdate) {
+    public Item(String name, String expdate, String userID) {
         this.name = name;
         this.expdate = expdate;
+        this.userID = userID;
     }
 
     public String getName() {
@@ -26,5 +28,13 @@ public class Item {
 
     public void setExpdate(String expdate) {
         this.expdate = expdate;
+    }
+
+    public String getUserID() {
+        return userID;
+    }
+
+    public void setUserID(String userID) {
+        this.userID = userID;
     }
 }
