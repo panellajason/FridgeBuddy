@@ -2,6 +2,7 @@ package com.example.app.activities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
@@ -42,7 +43,7 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 import java.util.Calendar;
 import java.util.List;
 
-public class NewItemActivity extends HelperActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener {
+public class NewItemActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener {
 
     private Bitmap mBitmap;
     private ImageView mImageView;
@@ -64,6 +65,7 @@ public class NewItemActivity extends HelperActivity implements View.OnClickListe
         setContentView(R.layout.activity_new_item);
 
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+        setTitle("Add Food Item");
 
         mAuth = FirebaseAuth.getInstance();
 
