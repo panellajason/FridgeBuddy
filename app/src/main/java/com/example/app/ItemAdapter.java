@@ -32,6 +32,10 @@ public class ItemAdapter extends FirestoreRecyclerAdapter <Item, ItemAdapter.Ite
         return new ItemHolder(v);
     }
 
+    public void deleteItem(int position) {
+        getSnapshots().getSnapshot(position).getReference().delete();
+    }
+
     class ItemHolder extends RecyclerView.ViewHolder {
 
         TextView name;

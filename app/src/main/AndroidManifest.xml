@@ -12,9 +12,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".LoginActivity"/>
+        <activity android:name=".MainActivity" />
+        <activity
+            android:name=".NewItemActivity"
+            android:parentActivityName=".MainActivity" />
         <activity android:name=".HelperActivity" />
-        <activity android:name=".NewItemActivity">
+        <activity
+            android:name=".RegisterActivity"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

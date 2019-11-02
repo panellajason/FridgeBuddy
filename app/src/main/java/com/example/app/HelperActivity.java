@@ -21,17 +21,14 @@ import androidx.core.app.ActivityCompat;
 public class HelperActivity extends AppCompatActivity {
     public static final int RC_STORAGE_PERMS1 = 101;
     public static final int RC_SELECT_PICTURE = 103;
-    public static final String ACTION_BAR_TITLE = "action_bar_title";
+    public static final String ACTION_BAR_TITLE = "Add Food Item";
     public static File imageFile = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setTitle(getIntent().getStringExtra(ACTION_BAR_TITLE));
-        }
+        setTitle("Add Food Item");
+
     }
 
     @Override

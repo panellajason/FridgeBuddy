@@ -1,19 +1,19 @@
 package com.example.app;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 
-import android.Manifest;
+import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.net.Uri;
@@ -21,6 +21,8 @@ import android.net.Uri;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.label.FirebaseVisionLabel;
@@ -29,36 +31,75 @@ import com.google.firebase.ml.vision.label.FirebaseVisionLabelDetectorOptions;
 import com.google.firebase.ml.vision.text.FirebaseVisionText;
 import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
 
+import java.util.Calendar;
 import java.util.List;
 
-public class NewItemActivity extends HelperActivity implements View.OnClickListener {
+public class NewItemActivity extends HelperActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener {
 
     private Bitmap mBitmap;
     private ImageView mImageView;
-    private TextView mTextView;
+    private EditText nameET;
+    private TextView expDateTV;
+    private RadioButton fridgeBtn;
+    private RadioButton freezerBtn;
+    private RadioButton cabinetBtn;
+    private RadioGroup radioGroup;
+    private Button chooseDateBtn;
+    private Button saveBtn;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_item);
 
-        mTextView = findViewById(R.id.textView);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+
+        nameET = findViewById(R.id.nameET);
+        expDateTV = findViewById(R.id.expdateTV);
         mImageView = findViewById(R.id.imageView);
-        findViewById(R.id.btn_imlabeler).setOnClickListener(this);
-        findViewById(R.id.btn_textrec).setOnClickListener(this);
+        fridgeBtn = findViewById(R.id.fridgeBtn);
+        freezerBtn = findViewById(R.id.freezerBtn);
+        cabinetBtn = findViewById(R.id.cabinetBtn);
+        chooseDateBtn = findViewById(R.id.chooseDateBtn);
+        saveBtn = findViewById(R.id.saveBtn);
+        radioGroup = findViewById(R.id.radioGroup);
+
+        findViewById(R.id.imageLabelerBtn).setOnClickListener(this);
+        findViewById(R.id.textRecBtn).setOnClickListener(this);
+        findViewById(R.id.saveBtn).setOnClickListener(this);
+        findViewById(R.id.chooseDateBtn).setOnClickListener(this);
+
     }
 
     @Override
     public void onClick(View view) {
-        mTextView.setText(null);
+
         switch (view.getId()) {
-            case R.id.btn_imlabeler:
+            case R.id.imageLabelerBtn:
+                nameET.setText(null);
                 runImageLabeler();
                 break;
-            case R.id.btn_textrec:
+            case R.id.textRecBtn:
+                nameET.setText(null);
                 runTextRecognition();
                 break;
+            case R.id.chooseDateBtn:
+                showDatePicker();
+                break;
+            case R.id.saveBtn:
+                saveItem();
+                break;
         }
+    }
+
+    private void showDatePicker() {
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, this, Calendar.getInstance().get(Calendar.YEAR),
+                Calendar.getInstance().get(Calendar.MONTH),
+                Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+        );
+        datePickerDialog.show();
     }
 
     private void runTextRecognition() {
@@ -80,29 +121,15 @@ public class NewItemActivity extends HelperActivity implements View.OnClickListe
     }
 
     private void processExtractedText(FirebaseVisionText firebaseVisionText) {
-        mTextView.setText(null);
         if (firebaseVisionText.getTextBlocks().size() == 0) {
-            mTextView.setText("No text");
+            nameET.setText("No text");
             return;
         }
 
-//        List<FirebaseVisionText.TextBlock> results = firebaseVisionText.getTextBlocks();
-//        if(results.size() > 2) {
-//            for (int i = 0; i < 3; i++) {
-//                mTextView.append("block: " + results.get(i).getLines() + "\n");
-//            }
-//        } else {
-//            for (FirebaseVisionText.TextBlock block : firebaseVisionText.getTextBlocks()) {
-//                mTextView.append("block: " + block.getLines() + "\n");
-//            }
-//        }
-
-
         for (FirebaseVisionText.TextBlock block : firebaseVisionText.getTextBlocks()) {
 
-            mTextView.append("block: " + block.getText() + "\n");
             for (FirebaseVisionText.Line line : block.getLines()) {
-                mTextView.append("line: " + line.getText() + "\n");
+                nameET.append(line.getText() + "\n");
             }
         }
     }
@@ -122,15 +149,14 @@ public class NewItemActivity extends HelperActivity implements View.OnClickListe
                 public void onSuccess(List<FirebaseVisionLabel> labels) {
                     for (FirebaseVisionLabel label : labels) {
 
-                        mTextView.append(label.getLabel() + "\n");
-                        mTextView.append(label.getConfidence() + "\n\n");
+                        nameET.append(label.getLabel() + "\n");
+                        //mTextView.append(label.getConfidence() + "\n\n");
                     }
                 }
 
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    mTextView.setText(e.getMessage());
                 }
             });
         }
@@ -155,7 +181,7 @@ public class NewItemActivity extends HelperActivity implements View.OnClickListe
                         //mBitmap = MyHelper.resizeImage(imageFile, path, mImageView);
                     }
                     //if (mBitmap != null) {
-                        mTextView.setText(null);
+                        nameET.setText(null);
                         mImageView.setImageURI(dataUri);
                     //}
                     mImageView.invalidate();
@@ -167,27 +193,29 @@ public class NewItemActivity extends HelperActivity implements View.OnClickListe
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.new_item, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
-            case R.id.save_item:
-                saveItem();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-
-    }
-
     private void saveItem() {
 
+        int selectedID = radioGroup.getCheckedRadioButtonId();
+        RadioButton selectedRadioButton = (RadioButton)findViewById(selectedID);
+        String storageLocation = selectedRadioButton.getText().toString();
+        String foodName = nameET.getText().toString();
+        String expDate = expDateTV.getText().toString();
 
+        if(foodName.trim().isEmpty() || expDate.equals("Expiration Date:")) {
+            Toast.makeText(getApplicationContext(), "Please enter a food name and/or expiration date.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        CollectionReference itemRef = FirebaseFirestore.getInstance()
+                .collection("Items");
+        itemRef.add(new Item(foodName, expDate));
+
+        Toast.makeText(getApplicationContext(), "Food Item Saved", Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(NewItemActivity.this, MainActivity.class));
+    }
+
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        expDateTV.setText(month + "/" + dayOfMonth + "/" + year);
     }
 }
