@@ -21,10 +21,9 @@ public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private BottomNavigationView bottomNav;
+    private Fragment listFragment;
+    private Fragment accountFragment;
 
-
-    private final Fragment listFragment = new ListFragment();
-    private final Fragment accountFragment = new AccountFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +33,12 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         if(mAuth.getCurrentUser() != null) {
+             listFragment = new ListFragment();
+             accountFragment = new AccountFragment();
 
             bottomNav = (BottomNavigationView) findViewById(R.id.bottomNav);
+
+            replaceFragment(listFragment);
 
             bottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
@@ -105,6 +108,9 @@ public class MainActivity extends AppCompatActivity {
 
             sendToLogin();
         }
+
+        bottomNav.setSelectedItemId(R.id.navList);
+
     }
 
     private void sendToLogin() {
@@ -113,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
-    private void replaceFragment(Fragment fragment) {
+    public void replaceFragment(Fragment fragment) {
         FragmentTransaction fragTras = getSupportFragmentManager().beginTransaction();
         fragTras.replace(R.id.mainContainer, fragment);
         fragTras.commit();

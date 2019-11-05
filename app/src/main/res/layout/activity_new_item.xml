@@ -47,7 +47,7 @@
 
                 <Button
                     android:id="@+id/imageLabelerBtn"
-                    android:layout_width="180dp"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="10dp"
@@ -57,11 +57,20 @@
 
                 <Button
                     android:id="@+id/textRecBtn"
-                    android:layout_width="180dp"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:background="#378EB4"
                     android:text="Text Recognizer"
+                    android:textColor="#FFFFFF" />
+
+                <Button
+                    android:id="@+id/barcodeScanBtn"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:background="#378EB4"
+                    android:text="Barcode Scanner"
                     android:textColor="#FFFFFF" />
             </LinearLayout>
 
@@ -75,7 +84,7 @@
                 android:ems="10"
                 android:hint="Food Name"
                 android:inputType="textPersonName"
-                android:maxLength="30"
+                android:maxLength="50"
                 android:maxLines="1"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

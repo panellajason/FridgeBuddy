@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.Menu;
@@ -23,14 +25,24 @@ import android.widget.Toast;
 import android.net.Uri;
 
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.app.models.Item;
 import com.example.app.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.ml.vision.FirebaseVision;
+import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode;
+import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetector;
+import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.label.FirebaseVisionLabel;
 import com.google.firebase.ml.vision.label.FirebaseVisionLabelDetector;
@@ -39,6 +51,9 @@ import com.google.firebase.ml.vision.text.FirebaseVisionText;
 import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Calendar;
 import java.util.List;
@@ -57,6 +72,7 @@ public class NewItemActivity extends AppCompatActivity implements View.OnClickLi
     private Button saveBtn;
     private Uri postURI = null;
     private FirebaseAuth mAuth;
+    private RequestQueue mQueue;
 
 
     @Override
@@ -83,7 +99,10 @@ public class NewItemActivity extends AppCompatActivity implements View.OnClickLi
         findViewById(R.id.textRecBtn).setOnClickListener(this);
         findViewById(R.id.saveBtn).setOnClickListener(this);
         findViewById(R.id.chooseDateBtn).setOnClickListener(this);
+        findViewById(R.id.barcodeScanBtn).setOnClickListener(this);
 
+
+        mQueue = Volley.newRequestQueue(this);
     }
 
     @Override
@@ -106,6 +125,7 @@ public class NewItemActivity extends AppCompatActivity implements View.OnClickLi
                 break;
 
         }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -120,6 +140,9 @@ public class NewItemActivity extends AppCompatActivity implements View.OnClickLi
             case R.id.textRecBtn:
                 nameET.setText(null);
                 runTextRecognition();
+                break;
+            case R.id.barcodeScanBtn:
+                runBarcodeScanner();
                 break;
             case R.id.chooseDateBtn:
                 showDatePicker();
@@ -198,6 +221,42 @@ public class NewItemActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
+    private void runBarcodeScanner() {
+
+        FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(mBitmap);
+
+        FirebaseVisionBarcodeDetectorOptions options =
+                new FirebaseVisionBarcodeDetectorOptions.Builder()
+                        .setBarcodeFormats(
+                                FirebaseVisionBarcode.FORMAT_EAN_13).build();
+
+        FirebaseVisionBarcodeDetector detector = FirebaseVision.getInstance()
+                .getVisionBarcodeDetector();
+
+        Task<List<FirebaseVisionBarcode>> result = detector.detectInImage(image)
+                .addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionBarcode>>() {
+                    @Override
+                    public void onSuccess(List<FirebaseVisionBarcode> barcodes) {
+                        for (FirebaseVisionBarcode barcode: barcodes) {
+                            Rect bounds = barcode.getBoundingBox();
+                            Point[] corners = barcode.getCornerPoints();
+
+                            String rawValue = barcode.getRawValue();
+
+                            jsonParse(rawValue);
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Task failed with an exception
+                        // ...
+                    }
+                });
+
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
@@ -209,14 +268,14 @@ public class NewItemActivity extends AppCompatActivity implements View.OnClickLi
                 postURI = result.getUri();
                 mImageView.setImageURI(postURI);
 
+                mImageView.invalidate();
+                BitmapDrawable drawable = (BitmapDrawable) mImageView.getDrawable();
+                mBitmap = drawable.getBitmap();
+
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
             }
         }
-
-        mImageView.invalidate();
-        BitmapDrawable drawable = (BitmapDrawable) mImageView.getDrawable();
-        mBitmap = drawable.getBitmap();
 
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -245,5 +304,30 @@ public class NewItemActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
         expDateTV.setText(month + "/" + dayOfMonth + "/" + year);
+    }
+
+    private void jsonParse(String barcode) {
+        String url = "https://world.openfoodfacts.org/api/v0/product/" + barcode + ".json";
+
+        final JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null
+,                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String foodName = response.getJSONObject("product").getString("product_name");
+                            nameET.setText(foodName);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+
+        mQueue.add(request);
     }
 }
