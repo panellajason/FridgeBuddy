@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setTitle("Food List");
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -89,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
             case R.id.actionSettings:
                 replaceFragment(accountFragment);
                 return true;
+            case R.id.actionSearch:
+                startActivity(new Intent(MainActivity.this, FilterActivity.class));
             default:
                 return false;
         }
@@ -114,8 +117,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendToLogin() {
-        Intent i = new Intent(MainActivity.this, LoginActivity.class);
-        startActivity(i);
+        startActivity(new Intent(MainActivity.this, LoginActivity.class));
         finish();
     }
 

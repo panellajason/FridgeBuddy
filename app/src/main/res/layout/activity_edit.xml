@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.EditActivity">
+
+    <ScrollView
+        android:id="@+id/scrollViewE"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+        <LinearLayout
+            android:id="@+id/linearLayoutE"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/saveBtn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/imageViewE"
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:layout_gravity="center|top"
+                android:layout_margin="10dp"
+                android:adjustViewBounds="true"
+                android:src="@drawable/ic_launcher_background" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/imageLabelerBtnE"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="#378EB4"
+                    android:text="Image Labeler"
+                    android:textColor="#FFFFFF" />
+
+                <Button
+                    android:id="@+id/textRecBtnE"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:background="#378EB4"
+                    android:text="Text Recognizer"
+                    android:textColor="#FFFFFF" />
+
+                <Button
+                    android:id="@+id/barcodeScanBtnE"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:background="#378EB4"
+                    android:text="Barcode Scanner"
+                    android:textColor="#FFFFFF" />
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/nameETE"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="0dp"
+                android:layout_marginRight="0dp"
+                android:ems="10"
+                android:hint="Food Name"
+                android:inputType="textPersonName"
+                android:maxLength="50"
+                android:maxLines="1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/expdateTVE"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Expiration Date:"
+                    android:textSize="18dp" />
+
+                <Button
+                    android:id="@+id/chooseDateBtnE"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="20dp"
+                    android:text="Choose Date" />
+            </LinearLayout>
+
+            <RadioGroup
+                android:id="@+id/radioGroupE"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:padding="10dp">
+
+                <RadioButton
+                    android:id="@+id/fridgeBtnE"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Refrigerator" />
+
+                <RadioButton
+                    android:id="@+id/freezerBtnE"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Freezer" />
+
+                <RadioButton
+                    android:id="@+id/cabinetBtnE"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Cabinet" />
+
+            </RadioGroup>
+
+            <Button
+                android:id="@+id/editBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:layout_marginTop="663dp"
+                android:background="#E61509"
+                android:text="Edit"
+                android:textColor="#FFFFFF" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

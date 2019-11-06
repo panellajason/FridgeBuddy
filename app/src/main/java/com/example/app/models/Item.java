@@ -5,13 +5,15 @@ public class Item {
     private String name;
     private String expdate;
     private String userID;
+    private String storagelocation;
 
     public Item(){}
 
-    public Item(String name, String expdate, String userID) {
+    public Item(String name, String expdate, String userID, String storagelocation) {
         this.name = name;
         this.expdate = expdate;
         this.userID = userID;
+        this.storagelocation = storagelocation;
     }
 
     public String getName() {
@@ -36,5 +38,13 @@ public class Item {
 
     public void setUserID(String userID) {
         this.userID = userID;
+    }
+
+    public String getStoragelocation() {
+        return storagelocation;
+    }
+
+    public void setStoragelocation(String storagelocation) {
+        this.storagelocation = storagelocation;
     }
 }

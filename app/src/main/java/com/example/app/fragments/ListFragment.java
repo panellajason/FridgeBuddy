@@ -1,11 +1,9 @@
 package com.example.app.fragments;
 
-import android.content.Context;
-import android.net.Uri;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,11 +14,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.app.R;
+import com.example.app.activities.EditActivity;
 import com.example.app.models.Item;
 import com.example.app.models.ItemAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
@@ -38,7 +38,7 @@ public class ListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_list, container, false);
-
+        getActivity().setTitle("Your Food List");
         setUpRecyclerView(view);
 
         return view;
@@ -46,7 +46,8 @@ public class ListFragment extends Fragment {
 
     private void setUpRecyclerView(View view) {
 
-        Query query = itemRef.orderBy("name", Query.Direction.DESCENDING).whereEqualTo("userID", mAuth.getUid());
+        Query query = itemRef.orderBy("expdate", Query.Direction.ASCENDING).whereEqualTo("userID", mAuth.getUid());
+
 
         FirestoreRecyclerOptions<Item> options = new FirestoreRecyclerOptions.Builder<Item>()
                 .setQuery(query, Item.class)
@@ -72,8 +73,37 @@ public class ListFragment extends Fragment {
             }
         }).attachToRecyclerView(recView);
 
-        itemAdapter.startListening();
+        itemAdapter.setOnItemClickListener(new ItemAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
+
+                String path = documentSnapshot.getReference().getPath();
+                String name = documentSnapshot.toObject(Item.class).getName();
+                String expDate = documentSnapshot.toObject(Item.class).getExpdate();
+                String storageLocation = documentSnapshot.toObject(Item.class).getStoragelocation();
+
+                Intent i = new Intent(getActivity(), EditActivity.class);
+
+                i.putExtra("PATH", path);
+                i.putExtra("NAME", name);
+                i.putExtra("EXP_DATE", expDate);
+                i.putExtra("STORAGE_LOCATION", storageLocation);
+
+                startActivity(i);
+            }
+        });
 
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        itemAdapter.startListening();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        itemAdapter.stopListening();
+    }
 }

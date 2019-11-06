@@ -21,7 +21,7 @@
             android:layout_alignParentLeft="true"
             android:layout_toLeftOf="@id/item_expdate"
             android:ellipsize="end"
-            android:maxLines="1"
+            android:singleLine="true"
             android:text="Food Name"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 

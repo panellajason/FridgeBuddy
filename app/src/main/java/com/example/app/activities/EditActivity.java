@@ -7,7 +7,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,8 +22,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.net.Uri;
-
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -28,8 +29,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.app.models.Item;
 import com.example.app.R;
+import com.example.app.models.Item;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -39,6 +40,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode;
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetector;
+import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.label.FirebaseVisionLabel;
 import com.google.firebase.ml.vision.label.FirebaseVisionLabelDetector;
@@ -54,41 +56,74 @@ import org.json.JSONObject;
 import java.util.Calendar;
 import java.util.List;
 
-public class NewItemActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener {
+public class EditActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener {
 
-    private Bitmap mBitmap = null;
+    private Bitmap mBitmap;
     private ImageView mImageView;
     private EditText nameET;
     private TextView expDateTV;
+    private RadioButton fridgeBtn;
+    private RadioButton freezerBtn;
+    private RadioButton cabinetBtn;
     private RadioGroup radioGroup;
     private Uri postURI = null;
     private RequestQueue mQueue;
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    ;
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference itemRef = db.collection("Items");
-
+    private String mPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_item);
+        setContentView(R.layout.activity_edit);
 
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
-        setTitle("Add Food Item");
+        setTitle("Edit Food Item");
 
-        nameET = findViewById(R.id.nameET);
-        expDateTV = findViewById(R.id.expdateTV);
-        mImageView = findViewById(R.id.imageView);
-        radioGroup = findViewById(R.id.radioGroup);
+        mImageView = findViewById(R.id.imageViewE);
+        nameET = findViewById(R.id.nameETE);
+        expDateTV = findViewById(R.id.expdateTVE);
+        fridgeBtn = findViewById(R.id.fridgeBtnE);
+        freezerBtn = findViewById(R.id.freezerBtnE);
+        cabinetBtn = findViewById(R.id.cabinetBtnE);
+        radioGroup = findViewById(R.id.radioGroupE);
 
-        findViewById(R.id.imageLabelerBtn).setOnClickListener(this);
-        findViewById(R.id.textRecBtn).setOnClickListener(this);
-        findViewById(R.id.saveBtn).setOnClickListener(this);
-        findViewById(R.id.chooseDateBtn).setOnClickListener(this);
-        findViewById(R.id.barcodeScanBtn).setOnClickListener(this);
+        findViewById(R.id.imageLabelerBtnE).setOnClickListener(this);
+        findViewById(R.id.textRecBtnE).setOnClickListener(this);
+        findViewById(R.id.editBtn).setOnClickListener(this);
+        findViewById(R.id.chooseDateBtnE).setOnClickListener(this);
+        findViewById(R.id.barcodeScanBtnE).setOnClickListener(this);
 
         mQueue = Volley.newRequestQueue(this);
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            mPath = extras.getString("PATH");
+            String name = extras.getString("NAME");
+            String expDate = extras.getString("EXP_DATE");
+            String storageLocation = extras.getString("STORAGE_LOCATION");
+
+            nameET.setText(name);
+            expDateTV.setText(expDate);
+            mPath = mPath.substring(6);
+
+            switch (storageLocation) {
+                case "Refrigerator":
+                    fridgeBtn.setChecked(true);
+                    break;
+                case "Freezer":
+                    freezerBtn.setChecked(true);
+                    break;
+                case "Cabinet":
+                    cabinetBtn.setChecked(true);
+                    break;
+                default:
+                    break;
+
+            }
+
+        }
     }
 
     @Override
@@ -105,8 +140,8 @@ public class NewItemActivity extends AppCompatActivity implements View.OnClickLi
                 CropImage.activity()
                         .setGuidelines(CropImageView.Guidelines.ON)
                         .setMinCropResultSize(512, 512)
-                        .setAspectRatio(3, 2)
-                        .start(NewItemActivity.this);
+                        .setAspectRatio(1,1)
+                        .start(EditActivity.this);
                 break;
         }
 
@@ -117,23 +152,23 @@ public class NewItemActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View view) {
 
         switch (view.getId()) {
-            case R.id.imageLabelerBtn:
+            case R.id.imageLabelerBtnE:
                 nameET.setText(null);
                 runImageLabeler();
                 break;
-            case R.id.textRecBtn:
+            case R.id.textRecBtnE:
                 nameET.setText(null);
                 runTextRecognition();
                 break;
-            case R.id.barcodeScanBtn:
+            case R.id.barcodeScanBtnE:
                 nameET.setText(null);
                 runBarcodeScanner();
                 break;
-            case R.id.chooseDateBtn:
+            case R.id.chooseDateBtnE:
                 showDatePicker();
                 break;
-            case R.id.saveBtn:
-                saveItem();
+            case R.id.editBtn:
+                editItem();
                 break;
         }
     }
@@ -147,40 +182,39 @@ public class NewItemActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void runTextRecognition() {
-        if (mBitmap != null) {
+                if (mBitmap != null) {
 
-            FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(mBitmap);
+                    FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(mBitmap);
 
-            FirebaseVisionTextRecognizer detector = FirebaseVision.getInstance().getOnDeviceTextRecognizer();
+                    FirebaseVisionTextRecognizer detector = FirebaseVision.getInstance().getOnDeviceTextRecognizer();
 
-            detector.processImage(image).addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
-                @Override
-                public void onSuccess(FirebaseVisionText firebaseVisionText) {
+                    detector.processImage(image).addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
+                        @Override
+                        public void onSuccess(FirebaseVisionText firebaseVisionText) {
 
-                    if (firebaseVisionText.getTextBlocks().size() == 0) {
-                        nameET.setText("No text");
-                        return;
-                    }
+                            if (firebaseVisionText.getTextBlocks().size() == 0) {
+                                nameET.setText("No text");
+                                return;
+                            }
 
-                    for (FirebaseVisionText.TextBlock block : firebaseVisionText.getTextBlocks()) {
+                            for (FirebaseVisionText.TextBlock block : firebaseVisionText.getTextBlocks()) {
 
-                        for (FirebaseVisionText.Line line : block.getLines()) {
-                            nameET.append(line.getText() + "\n");
+                                for (FirebaseVisionText.Line line : block.getLines()) {
+                                    nameET.append(line.getText() + "\n");
+                                }
+                            }
                         }
-                    }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            exception.printStackTrace();
+                        }
+                    });
                 }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    exception.printStackTrace();
-                }
-            });
-        }
-        else {
-            Toast.makeText(getApplicationContext(), "Please select an image", Toast.LENGTH_SHORT).show();
+                else {
+                    Toast.makeText(getApplicationContext(), "Please select an image", Toast.LENGTH_SHORT).show();
         }
     }
-
 
     private void runImageLabeler() {
         if (mBitmap != null) {
@@ -245,8 +279,7 @@ public class NewItemActivity extends AppCompatActivity implements View.OnClickLi
                                                 nameET.setText(foodName);
 
                                             } catch (JSONException e) {
-
-                                                nameET.setText(e.getMessage());
+                                                e.printStackTrace();
                                             }
                                         }
                                     }, new Response.ErrorListener() {
@@ -298,7 +331,7 @@ public class NewItemActivity extends AppCompatActivity implements View.OnClickLi
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void saveItem() {
+    private void editItem() {
 
         int selectedID = radioGroup.getCheckedRadioButtonId();
         RadioButton selectedRadioButton = findViewById(selectedID);
@@ -316,15 +349,14 @@ public class NewItemActivity extends AppCompatActivity implements View.OnClickLi
             return;
         }
 
-        itemRef.add(new Item(foodName, expDate, mAuth.getUid(), storageLocation));
+        itemRef.document(mPath).update("name", foodName, "expdate", expDate, "storagelocation", storageLocation);
 
-        Toast.makeText(getApplicationContext(), "Food Item Saved", Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(NewItemActivity.this, MainActivity.class));
+        Toast.makeText(getApplicationContext(), "Food Item Edited", Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(EditActivity.this, MainActivity.class));
     }
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
         expDateTV.setText(++month + "/" + dayOfMonth + "/" + year);
     }
-
 }
