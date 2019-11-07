@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Adapter;
 import android.widget.AdapterView;
@@ -25,6 +27,8 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 public class FilterActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -54,7 +58,7 @@ public class FilterActivity extends AppCompatActivity implements AdapterView.OnI
         spinner.setAdapter(arrayAdapter);
         spinner.setOnItemSelectedListener(this);
 
-        setUpRecyclerView();
+        stringSearch("","");
 
         filterBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,10 +71,12 @@ public class FilterActivity extends AppCompatActivity implements AdapterView.OnI
 
     private void stringSearch (String search, String spinner) {
         Query query;
-        if(spinner.trim().isEmpty())
-            query = itemRef.orderBy("name").startAt(search).endAt(search + "\uf8ff").whereEqualTo("userID", mAuth.getUid());
+        if(spinner.trim().isEmpty() && search.trim().isEmpty())
+            query = itemRef.orderBy("timestamp", Query.Direction.ASCENDING).whereEqualTo("userID", mAuth.getUid());
+        else if(spinner.trim().isEmpty())
+            query = itemRef.orderBy("name", Query.Direction.ASCENDING).startAt(search).endAt(search + "\uf8ff").whereEqualTo("userID", mAuth.getUid());
         else
-            query = itemRef.orderBy("name").startAt(search).endAt(search + "\uf8ff").whereEqualTo("userID", mAuth.getUid()).whereEqualTo("storagelocation", spinner);
+            query = itemRef.orderBy("name", Query.Direction.ASCENDING).whereEqualTo("userID", mAuth.getUid()).whereEqualTo("storagelocation", spinner).startAt(search).endAt(search + "\uf8ff");
 
         FirestoreRecyclerOptions<Item> options = new FirestoreRecyclerOptions.Builder<Item>()
                 .setQuery(query, Item.class)
@@ -120,8 +126,7 @@ public class FilterActivity extends AppCompatActivity implements AdapterView.OnI
 
     private void setUpRecyclerView() {
 
-        Query query = itemRef.orderBy("name", Query.Direction.DESCENDING).whereEqualTo("userID", mAuth.getUid());
-
+        Query query = itemRef.orderBy("timestamp", Query.Direction.ASCENDING).whereEqualTo("userID", mAuth.getUid());
 
         FirestoreRecyclerOptions<Item> options = new FirestoreRecyclerOptions.Builder<Item>()
                 .setQuery(query, Item.class)
@@ -169,7 +174,6 @@ public class FilterActivity extends AppCompatActivity implements AdapterView.OnI
 
     }
 
-
     @Override
     public void onStart() {
         super.onStart();
@@ -190,6 +194,26 @@ public class FilterActivity extends AppCompatActivity implements AdapterView.OnI
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.filter_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.action_refresh:
+                searchET.setText("");
+                spinner.setSelection(0);
+                stringSearch("","");
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
 

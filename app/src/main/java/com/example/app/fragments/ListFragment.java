@@ -46,7 +46,7 @@ public class ListFragment extends Fragment {
 
     private void setUpRecyclerView(View view) {
 
-        Query query = itemRef.orderBy("expdate", Query.Direction.ASCENDING).whereEqualTo("userID", mAuth.getUid());
+        Query query = itemRef.orderBy("timestamp", Query.Direction.ASCENDING).whereEqualTo("userID", mAuth.getUid());
 
 
         FirestoreRecyclerOptions<Item> options = new FirestoreRecyclerOptions.Builder<Item>()

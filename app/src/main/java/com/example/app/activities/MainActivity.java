@@ -13,9 +13,19 @@ import android.view.MenuItem;
 import com.example.app.fragments.AccountFragment;
 import com.example.app.fragments.ListFragment;
 import com.example.app.R;
+import com.example.app.fragments.NotificationsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+
+/*
+    -profile pic
+    -notifications
+    -shopping list (user can highlight item if they have it)
+ */
+
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView bottomNav;
     private Fragment listFragment;
     private Fragment accountFragment;
+    private Fragment notificationsFragment;
+
 
 
     @Override
@@ -36,8 +48,9 @@ public class MainActivity extends AppCompatActivity {
         if(mAuth.getCurrentUser() != null) {
              listFragment = new ListFragment();
              accountFragment = new AccountFragment();
+            notificationsFragment = new NotificationsFragment();
 
-            bottomNav = (BottomNavigationView) findViewById(R.id.bottomNav);
+            bottomNav = findViewById(R.id.bottomNav);
 
             replaceFragment(listFragment);
 
@@ -51,8 +64,11 @@ public class MainActivity extends AppCompatActivity {
                             replaceFragment(listFragment);
                             return true;
                         case R.id.navAdd:
-                            startActivity(new Intent(MainActivity.this, NewItemActivity.class));
+                            startActivity(new Intent(MainActivity.this, AddActivity.class));
                             return true;
+                        case R.id.navNotifications:
+                             replaceFragment(notificationsFragment);
+                             return true;
                         case R.id.navAccount:
                            replaceFragment(accountFragment);
                             return true;

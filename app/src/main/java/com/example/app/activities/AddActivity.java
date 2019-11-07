@@ -33,6 +33,7 @@ import com.example.app.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -51,10 +52,14 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
-public class NewItemActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener {
+public class AddActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener {
 
     private Bitmap mBitmap = null;
     private ImageView mImageView;
@@ -72,7 +77,7 @@ public class NewItemActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_item);
+        setContentView(R.layout.activity_add);
 
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
         setTitle("Add Food Item");
@@ -89,11 +94,12 @@ public class NewItemActivity extends AppCompatActivity implements View.OnClickLi
         findViewById(R.id.barcodeScanBtn).setOnClickListener(this);
 
         mQueue = Volley.newRequestQueue(this);
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
+        getMenuInflater().inflate(R.menu.add_or_edit_menu, menu);
         return true;
     }
 
@@ -106,7 +112,7 @@ public class NewItemActivity extends AppCompatActivity implements View.OnClickLi
                         .setGuidelines(CropImageView.Guidelines.ON)
                         .setMinCropResultSize(512, 512)
                         .setAspectRatio(3, 2)
-                        .start(NewItemActivity.this);
+                        .start(AddActivity.this);
                 break;
         }
 
@@ -180,7 +186,6 @@ public class NewItemActivity extends AppCompatActivity implements View.OnClickLi
             Toast.makeText(getApplicationContext(), "Please select an image", Toast.LENGTH_SHORT).show();
         }
     }
-
 
     private void runImageLabeler() {
         if (mBitmap != null) {
@@ -316,15 +321,28 @@ public class NewItemActivity extends AppCompatActivity implements View.OnClickLi
             return;
         }
 
-        itemRef.add(new Item(foodName, expDate, mAuth.getUid(), storageLocation));
+        Timestamp timestampDate = new Timestamp(new Date());
+        try {
+
+            DateFormat formatter;
+            formatter = new SimpleDateFormat("MM/dd/yyyy");
+            Date date = formatter.parse(expDate);
+            timestampDate = new Timestamp(date);
+        } catch (ParseException e) {
+            System.out.println("Exception :" + e);
+        }
+
+        itemRef.add(new Item(foodName, expDate, mAuth.getUid(), storageLocation, timestampDate));
+
 
         Toast.makeText(getApplicationContext(), "Food Item Saved", Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(NewItemActivity.this, MainActivity.class));
+        startActivity(new Intent(AddActivity.this, MainActivity.class));
     }
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
         expDateTV.setText(++month + "/" + dayOfMonth + "/" + year);
+
     }
 
 }
