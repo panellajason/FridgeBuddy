@@ -75,8 +75,11 @@ public class FilterActivity extends AppCompatActivity implements AdapterView.OnI
             query = itemRef.orderBy("timestamp", Query.Direction.ASCENDING).whereEqualTo("userID", mAuth.getUid());
         else if(spinner.trim().isEmpty())
             query = itemRef.orderBy("name", Query.Direction.ASCENDING).startAt(search).endAt(search + "\uf8ff").whereEqualTo("userID", mAuth.getUid());
+        else if(search.trim().isEmpty())
+            query = itemRef.orderBy("timestamp", Query.Direction.ASCENDING).whereEqualTo("userID", mAuth.getUid()).whereEqualTo("storagelocation", spinner);
         else
             query = itemRef.orderBy("name", Query.Direction.ASCENDING).whereEqualTo("userID", mAuth.getUid()).whereEqualTo("storagelocation", spinner).startAt(search).endAt(search + "\uf8ff");
+
 
         FirestoreRecyclerOptions<Item> options = new FirestoreRecyclerOptions.Builder<Item>()
                 .setQuery(query, Item.class)

@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,6 +18,7 @@ import com.example.app.fragments.NotificationsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
 
 
 /*
@@ -35,19 +37,19 @@ public class MainActivity extends AppCompatActivity {
     private Fragment accountFragment;
     private Fragment notificationsFragment;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         setTitle("Food List");
 
         mAuth = FirebaseAuth.getInstance();
 
         if(mAuth.getCurrentUser() != null) {
-             listFragment = new ListFragment();
-             accountFragment = new AccountFragment();
+
+            listFragment = new ListFragment();
+            accountFragment = new AccountFragment();
             notificationsFragment = new NotificationsFragment();
 
             bottomNav = findViewById(R.id.bottomNav);

@@ -364,6 +364,7 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
         itemRef.document(mPath).update("name", foodName, "expdate", expDate,
                 "storagelocation", storageLocation ,"timestamp", timestampDate);
 
+
         Toast.makeText(getApplicationContext(), "Food Item Edited", Toast.LENGTH_SHORT).show();
         startActivity(new Intent(EditActivity.this, MainActivity.class));
     }
