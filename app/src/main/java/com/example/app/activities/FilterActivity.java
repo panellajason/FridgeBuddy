@@ -127,56 +127,6 @@ public class FilterActivity extends AppCompatActivity implements AdapterView.OnI
         });
     }
 
-    private void setUpRecyclerView() {
-
-        Query query = itemRef.orderBy("timestamp", Query.Direction.ASCENDING).whereEqualTo("userID", mAuth.getUid());
-
-        FirestoreRecyclerOptions<Item> options = new FirestoreRecyclerOptions.Builder<Item>()
-                .setQuery(query, Item.class)
-                .build();
-
-        itemAdapter = new ItemAdapter(options);
-
-        RecyclerView recView = findViewById(R.id.recycler_viewFilter);
-        recView.setHasFixedSize(true);
-        recView.setLayoutManager(new LinearLayoutManager(this));
-        recView.setAdapter(itemAdapter);
-
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
-                ItemTouchHelper.LEFT) {
-            @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                return false;
-            }
-
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                itemAdapter.deleteItem(viewHolder.getAdapterPosition());
-            }
-        }).attachToRecyclerView(recView);
-
-        itemAdapter.setOnItemClickListener(new ItemAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
-
-                String path = documentSnapshot.getReference().getPath();
-                String name = documentSnapshot.toObject(Item.class).getName();
-                String expDate = documentSnapshot.toObject(Item.class).getExpdate();
-                String storageLocation = documentSnapshot.toObject(Item.class).getStoragelocation();
-
-                Intent i = new Intent(FilterActivity.this, EditActivity.class);
-
-                i.putExtra("PATH", path);
-                i.putExtra("NAME", name);
-                i.putExtra("EXP_DATE", expDate);
-                i.putExtra("STORAGE_LOCATION", storageLocation);
-
-                startActivity(i);
-            }
-        });
-
-    }
-
     @Override
     public void onStart() {
         super.onStart();

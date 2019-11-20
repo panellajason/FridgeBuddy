@@ -6,9 +6,12 @@ import android.content.Intent;
 import androidx.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.app.R;
@@ -17,22 +20,29 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
-public class RegisterActivity extends AppCompatActivity {
+import java.util.HashMap;
+import java.util.Map;
 
-    private FirebaseAuth mAuth;
+public class RegisterActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private FirebaseFirestore db;
+    private CollectionReference itemRef;
+
     private EditText emailET, passwordET, passwordET2;
     private Button registerBTN, goToLoginBTN;
     private ProgressBar progressBar;
+    private Spinner spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        mAuth = FirebaseAuth.getInstance();
 
         setTitle("Register");
-
 
         emailET = (EditText) findViewById(R.id.emailET1);
         passwordET = (EditText) findViewById(R.id.passwordET1);
@@ -40,6 +50,12 @@ public class RegisterActivity extends AppCompatActivity {
         registerBTN = (Button) findViewById(R.id.registerBTN);
         goToLoginBTN = (Button) findViewById(R.id.goToLoginBTN);
         progressBar = (ProgressBar) findViewById(R.id.progressBar1);
+        spinner = findViewById(R.id.registerSpinner);
+
+        ArrayAdapter<CharSequence> arrayAdapter = ArrayAdapter.createFromResource(this, R.array.account, android.R.layout.simple_spinner_item);
+        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(arrayAdapter);
+        spinner.setOnItemSelectedListener(this);
 
         goToLoginBTN.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,6 +83,14 @@ public class RegisterActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
+
+                                    db = FirebaseFirestore.getInstance();
+                                    itemRef = db.collection("User Settings");
+
+                                    Map<String, String> map = new HashMap<>();
+                                    map.put("notification_settings", spinner.getSelectedItem()+"");
+
+                                    itemRef.document(mAuth.getUid()).set(map);
 
                                     sendToMain();
 
@@ -105,4 +129,13 @@ public class RegisterActivity extends AppCompatActivity {
         finish();
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
 }

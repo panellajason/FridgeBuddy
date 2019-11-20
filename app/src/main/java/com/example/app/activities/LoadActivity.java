@@ -10,7 +10,7 @@ import com.example.app.R;
 
 public class LoadActivity extends AppCompatActivity {
 
-    private static int SPLASH_TIMEOUT = 3000;
+    private static int SPLASH_TIMEOUT = 2000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

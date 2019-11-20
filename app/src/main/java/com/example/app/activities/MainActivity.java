@@ -7,22 +7,29 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
+
 import com.example.app.fragments.AccountFragment;
+import com.example.app.fragments.AddFragment;
 import com.example.app.fragments.ListFragment;
 import com.example.app.R;
 import com.example.app.fragments.NotificationsFragment;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 
 /*
-    -profile pic
+    -recommendations for storage
+    -timestamp for food item
     -notifications
     -shopping list (user can highlight item if they have it)
  */
@@ -31,11 +38,16 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
 
-    private FirebaseAuth mAuth;
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private BottomNavigationView bottomNav;
     private Fragment listFragment;
     private Fragment accountFragment;
-    private Fragment notificationsFragment;
+    private Fragment addFragment;
+
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private DocumentReference userItemRef = db.document("User Settings/" + mAuth.getUid());
+    public static int settings;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,13 +56,33 @@ public class MainActivity extends AppCompatActivity {
 
         setTitle("Food List");
 
-        mAuth = FirebaseAuth.getInstance();
 
         if(mAuth.getCurrentUser() != null) {
 
+            userItemRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+                    if(documentSnapshot.exists()) {
+
+                        settings = Integer.parseInt(documentSnapshot.getString("notification_settings"));
+
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Document doesn't exist", Toast.LENGTH_SHORT).show();
+
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+
+                }
+            });
+
+
             listFragment = new ListFragment();
             accountFragment = new AccountFragment();
-            notificationsFragment = new NotificationsFragment();
+            addFragment = new AddFragment();
 
             bottomNav = findViewById(R.id.bottomNav);
 
@@ -66,10 +98,10 @@ public class MainActivity extends AppCompatActivity {
                             replaceFragment(listFragment);
                             return true;
                         case R.id.navAdd:
-                            startActivity(new Intent(MainActivity.this, AddActivity.class));
+                            replaceFragment(addFragment);
                             return true;
                         case R.id.navNotifications:
-                             replaceFragment(notificationsFragment);
+                             replaceFragment(new NotificationsFragment());
                              return true;
                         case R.id.navAccount:
                            replaceFragment(accountFragment);
@@ -88,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
         else {
             sendToLogin();
         }
+
     }
 
 
@@ -118,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
     private void logout() {
         mAuth.signOut();
         sendToLogin();
+        finish();
     }
 
     @Override
@@ -144,5 +178,6 @@ public class MainActivity extends AppCompatActivity {
         fragTras.replace(R.id.mainContainer, fragment);
         fragTras.commit();
     }
+
 }
 

@@ -41,9 +41,6 @@ import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode;
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetector;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
-import com.google.firebase.ml.vision.label.FirebaseVisionLabel;
-import com.google.firebase.ml.vision.label.FirebaseVisionLabelDetector;
-import com.google.firebase.ml.vision.label.FirebaseVisionLabelDetectorOptions;
 import com.google.firebase.ml.vision.text.FirebaseVisionText;
 import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -59,7 +56,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class AddActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener {
+public class AddByPicActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener {
 
     private Bitmap mBitmap = null;
     private ImageView mImageView;
@@ -69,7 +66,7 @@ public class AddActivity extends AppCompatActivity implements View.OnClickListen
     private Uri postURI = null;
     private RequestQueue mQueue;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    ;
+
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference itemRef = db.collection("Items");
 
@@ -77,7 +74,7 @@ public class AddActivity extends AppCompatActivity implements View.OnClickListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add);
+        setContentView(R.layout.activity_add_by_pic);
 
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
         setTitle("Add Food Item");
@@ -87,7 +84,6 @@ public class AddActivity extends AppCompatActivity implements View.OnClickListen
         mImageView = findViewById(R.id.imageView);
         radioGroup = findViewById(R.id.radioGroup);
 
-        findViewById(R.id.imageLabelerBtn).setOnClickListener(this);
         findViewById(R.id.textRecBtn).setOnClickListener(this);
         findViewById(R.id.saveBtn).setOnClickListener(this);
         findViewById(R.id.chooseDateBtn).setOnClickListener(this);
@@ -112,7 +108,7 @@ public class AddActivity extends AppCompatActivity implements View.OnClickListen
                         .setGuidelines(CropImageView.Guidelines.ON)
                         .setMinCropResultSize(512, 512)
                         .setAspectRatio(3, 2)
-                        .start(AddActivity.this);
+                        .start(AddByPicActivity.this);
                 break;
         }
 
@@ -123,10 +119,6 @@ public class AddActivity extends AppCompatActivity implements View.OnClickListen
     public void onClick(View view) {
 
         switch (view.getId()) {
-            case R.id.imageLabelerBtn:
-                nameET.setText(null);
-                runImageLabeler();
-                break;
             case R.id.textRecBtn:
                 nameET.setText(null);
                 runTextRecognition();
@@ -179,42 +171,6 @@ public class AddActivity extends AppCompatActivity implements View.OnClickListen
                 @Override
                 public void onFailure(@NonNull Exception exception) {
                     exception.printStackTrace();
-                }
-            });
-        }
-        else {
-            Toast.makeText(getApplicationContext(), "Please select an image", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void runImageLabeler() {
-        if (mBitmap != null) {
-
-            FirebaseVisionLabelDetectorOptions options = new FirebaseVisionLabelDetectorOptions.Builder()
-                    .setConfidenceThreshold(0.7f)
-                    .build();
-
-            FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(mBitmap);
-            FirebaseVisionLabelDetector detector = FirebaseVision.getInstance().getVisionLabelDetector(options);
-
-            detector.detectInImage(image).addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionLabel>>() {
-                @Override
-                public void onSuccess(List<FirebaseVisionLabel> labels) {
-                    if(labels.size() != 0) {
-                        for (FirebaseVisionLabel label : labels) {
-
-                            nameET.append(label.getLabel() + "\n");
-                            //mTextView.append(label.getConfidence() + "\n\n");
-                        }
-                    } else {
-                        nameET.setText("No results");
-                    }
-                }
-
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    e.printStackTrace();
                 }
             });
         }
@@ -336,7 +292,7 @@ public class AddActivity extends AppCompatActivity implements View.OnClickListen
 
 
         Toast.makeText(getApplicationContext(), "Food Item Saved", Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(AddActivity.this, MainActivity.class));
+        startActivity(new Intent(AddByPicActivity.this, MainActivity.class));
     }
 
     @Override

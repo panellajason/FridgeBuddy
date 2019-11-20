@@ -15,12 +15,15 @@ import android.view.ViewGroup;
 
 import com.example.app.R;
 import com.example.app.activities.EditActivity;
+import com.example.app.activities.MainActivity;
+import com.example.app.models.AlmostExpItemAdapter;
 import com.example.app.models.ExpiredItemAdapter;
 import com.example.app.models.Item;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -35,8 +38,11 @@ public class NotificationsFragment extends Fragment {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private CollectionReference itemRef = db.collection("Items");
+    private CollectionReference itemRefSet = db.collection("User Settings");
+    private DocumentReference userItemRef = db.document("User Settings/" + mAuth.getUid());
     private ExpiredItemAdapter itemAdapter;
-    private ExpiredItemAdapter itemAdapter2;
+    private AlmostExpItemAdapter itemAdapter2;
+    private Calendar cal = new GregorianCalendar();
 
     public NotificationsFragment() {}
 
@@ -106,19 +112,19 @@ public class NotificationsFragment extends Fragment {
 
     private void setupRecyclerView2(View view) {
 
-        Calendar cal = new GregorianCalendar();
-        cal.add(Calendar.DAY_OF_MONTH, 2);
+        cal.add(Calendar.DAY_OF_MONTH, MainActivity.settings);
         Date date = cal.getTime();
 
         Query query = itemRef.orderBy("timestamp", Query.Direction.ASCENDING).whereEqualTo("userID", mAuth.getUid())
-                .whereLessThan("timestamp", new Timestamp(date))
-                .whereGreaterThan("timestamp", new Timestamp(Calendar.getInstance().getTime()));
+                .whereGreaterThan("timestamp", new Timestamp(Calendar.getInstance().getTime()))
+                .whereLessThan("timestamp", new Timestamp(date));
+
 
         FirestoreRecyclerOptions<Item> options = new FirestoreRecyclerOptions.Builder<Item>()
                 .setQuery(query, Item.class)
                 .build();
 
-        itemAdapter2 = new ExpiredItemAdapter(options);
+        itemAdapter2 = new AlmostExpItemAdapter(options);
 
         RecyclerView recView = view.findViewById(R.id.recycler_viewNotifications2);
         recView.setHasFixedSize(true);
@@ -138,7 +144,7 @@ public class NotificationsFragment extends Fragment {
             }
         }).attachToRecyclerView(recView);
 
-        itemAdapter2.setOnItemClickListener(new ExpiredItemAdapter.OnItemClickListener() {
+        itemAdapter2.setOnItemClickListener(new AlmostExpItemAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
 
@@ -159,6 +165,7 @@ public class NotificationsFragment extends Fragment {
         });
 
     }
+
 
     @Override
     public void onStart() {

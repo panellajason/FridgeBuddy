@@ -4,23 +4,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.AddActivity">
+    tools:context=".activities.AddByPicActivity">
 
     <ScrollView
         android:id="@+id/scrollView3"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#E4D6D6"
+        android:foregroundGravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintVertical_bias="1.0">
 
         <LinearLayout
             android:id="@+id/linearLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical"
             android:padding="10dp"
@@ -44,16 +46,6 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/imageLabelerBtn"
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:background="#378EB4"
-                    android:text="Image Labeler"
-                    android:textColor="#FFFFFF" />
 
                 <Button
                     android:id="@+id/textRecBtn"
@@ -149,13 +141,11 @@
                 android:layout_marginTop="663dp"
                 android:background="#E61509"
                 android:text="Save"
-                android:textColor="#FFFFFF"
-                />
+                android:textColor="#FFFFFF" />
 
         </LinearLayout>
 
     </ScrollView>
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
