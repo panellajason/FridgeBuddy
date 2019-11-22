@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.app.R;
 import com.example.app.activities.EditActivity;
@@ -23,11 +24,9 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -38,10 +37,10 @@ public class NotificationsFragment extends Fragment {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private CollectionReference itemRef = db.collection("Items");
-    private CollectionReference itemRefSet = db.collection("User Settings");
-    private DocumentReference userItemRef = db.document("User Settings/" + mAuth.getUid());
     private ExpiredItemAdapter itemAdapter;
     private AlmostExpItemAdapter itemAdapter2;
+    private TextView expiringTV;
+    private TextView changeThisTV;
     private Calendar cal = new GregorianCalendar();
 
     public NotificationsFragment() {}
@@ -53,16 +52,29 @@ public class NotificationsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_notifications, container, false);
 
         getActivity().setTitle("Notifications");
+        expiringTV = view.findViewById(R.id.expiringTV);
+        changeThisTV = view.findViewById(R.id.changeThisTV);
+
+        expiringTV.setText("Expiring within " + MainActivity.settings + " day(s):");
+
+        changeThisTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity)getActivity()).goToAccount();
+
+            }
+        });
         setUpRecyclerView(view);
         setupRecyclerView2(view);
+
 
         return view;
     }
 
     private void setUpRecyclerView(View view) {
 
-        Query query = itemRef.orderBy("timestamp", Query.Direction.ASCENDING).whereEqualTo("userID", mAuth.getUid())
-                .whereLessThan("timestamp", new Timestamp(Calendar.getInstance().getTime()));
+        Query query = itemRef.orderBy("expTimestamp", Query.Direction.ASCENDING).whereEqualTo("userID", mAuth.getUid())
+                .whereLessThan("expTimestamp", Timestamp.now());
 
         FirestoreRecyclerOptions<Item> options = new FirestoreRecyclerOptions.Builder<Item>()
                 .setQuery(query, Item.class)
@@ -96,6 +108,7 @@ public class NotificationsFragment extends Fragment {
                 String name = documentSnapshot.toObject(Item.class).getName();
                 String expDate = documentSnapshot.toObject(Item.class).getExpdate();
                 String storageLocation = documentSnapshot.toObject(Item.class).getStoragelocation();
+                String createdAt = documentSnapshot.toObject(Item.class).getCreatedAt().toDate().toString();
 
                 Intent i = new Intent(getActivity(), EditActivity.class);
 
@@ -103,6 +116,7 @@ public class NotificationsFragment extends Fragment {
                 i.putExtra("NAME", name);
                 i.putExtra("EXP_DATE", expDate);
                 i.putExtra("STORAGE_LOCATION", storageLocation);
+                i.putExtra("CREATED_AT", createdAt);
 
                 startActivity(i);
             }
@@ -115,9 +129,9 @@ public class NotificationsFragment extends Fragment {
         cal.add(Calendar.DAY_OF_MONTH, MainActivity.settings);
         Date date = cal.getTime();
 
-        Query query = itemRef.orderBy("timestamp", Query.Direction.ASCENDING).whereEqualTo("userID", mAuth.getUid())
-                .whereGreaterThan("timestamp", new Timestamp(Calendar.getInstance().getTime()))
-                .whereLessThan("timestamp", new Timestamp(date));
+        Query query = itemRef.orderBy("expTimestamp", Query.Direction.ASCENDING).whereEqualTo("userID", mAuth.getUid())
+                .whereGreaterThan("expTimestamp", Timestamp.now())
+                .whereLessThan("expTimestamp", new Timestamp(date));
 
 
         FirestoreRecyclerOptions<Item> options = new FirestoreRecyclerOptions.Builder<Item>()
@@ -152,6 +166,7 @@ public class NotificationsFragment extends Fragment {
                 String name = documentSnapshot.toObject(Item.class).getName();
                 String expDate = documentSnapshot.toObject(Item.class).getExpdate();
                 String storageLocation = documentSnapshot.toObject(Item.class).getStoragelocation();
+                String createdAt = documentSnapshot.toObject(Item.class).getCreatedAt().toDate().toString();
 
                 Intent i = new Intent(getActivity(), EditActivity.class);
 
@@ -159,6 +174,7 @@ public class NotificationsFragment extends Fragment {
                 i.putExtra("NAME", name);
                 i.putExtra("EXP_DATE", expDate);
                 i.putExtra("STORAGE_LOCATION", storageLocation);
+                i.putExtra("CREATED_AT", createdAt);
 
                 startActivity(i);
             }

@@ -10,10 +10,12 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="App"
-        android:roundIcon="@drawable/ic_search"
+        android:roundIcon="@drawable/fridge"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.AddManuallyActivity"
+        <activity android:name=".activities.SettingsActivity"></activity>
+        <activity
+            android:name=".activities.AddManuallyActivity"
             android:parentActivityName=".activities.MainActivity" />
         <activity android:name=".activities.MainActivity" />
         <activity

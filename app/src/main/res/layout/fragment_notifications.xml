@@ -14,7 +14,7 @@
         android:layout_marginTop="25dp"
         android:padding="3dp"
         android:scrollbars="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/textView5"
+        app:layout_constraintBottom_toTopOf="@+id/expiringTV"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -26,6 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:text="Expired:"
+        android:textColor="#000000"
         android:textSize="18dp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -36,10 +37,11 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/expiringTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Expiring Soon:"
+        android:text="Expiring within  day(s):"
+        android:textColor="#000000"
         android:textSize="18dp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/recycler_viewNotifications2"
@@ -59,6 +61,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+        app:layout_constraintTop_toBottomOf="@+id/expiringTV" />
+
+    <TextView
+        android:id="@+id/changeThisTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:text="Change this"
+        android:textColor="#2087DA"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/recycler_viewNotifications2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/expiringTV"
+        app:layout_constraintTop_toBottomOf="@+id/recycler_viewNotifications" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -17,9 +17,4 @@
         android:icon="@drawable/ic_notifications"
         android:title="Notifications"
         app:showAsAction="withText" />
-    <item
-        android:id="@+id/navAccount"
-        android:icon="@drawable/ic_account"
-        android:title="Account"
-        app:showAsAction="withText" />
 </menu>

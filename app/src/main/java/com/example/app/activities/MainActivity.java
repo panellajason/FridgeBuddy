@@ -12,7 +12,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.app.fragments.AccountFragment;
 import com.example.app.fragments.AddFragment;
 import com.example.app.fragments.ListFragment;
 import com.example.app.R;
@@ -29,7 +28,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 /*
     -recommendations for storage
-    -timestamp for food item
     -notifications
     -shopping list (user can highlight item if they have it)
  */
@@ -41,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private BottomNavigationView bottomNav;
     private Fragment listFragment;
-    private Fragment accountFragment;
     private Fragment addFragment;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -59,29 +56,9 @@ public class MainActivity extends AppCompatActivity {
 
         if(mAuth.getCurrentUser() != null) {
 
-            userItemRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                @Override
-                public void onSuccess(DocumentSnapshot documentSnapshot) {
-
-                    if(documentSnapshot.exists()) {
-
-                        settings = Integer.parseInt(documentSnapshot.getString("notification_settings"));
-
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Document doesn't exist", Toast.LENGTH_SHORT).show();
-
-                    }
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-
-                }
-            });
-
+            getUserSettings();
 
             listFragment = new ListFragment();
-            accountFragment = new AccountFragment();
             addFragment = new AddFragment();
 
             bottomNav = findViewById(R.id.bottomNav);
@@ -103,9 +80,7 @@ public class MainActivity extends AppCompatActivity {
                         case R.id.navNotifications:
                              replaceFragment(new NotificationsFragment());
                              return true;
-                        case R.id.navAccount:
-                           replaceFragment(accountFragment);
-                            return true;
+
 
                         default:
                             return false;
@@ -139,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                 logout();
                 return true;
             case R.id.actionSettings:
-                replaceFragment(accountFragment);
+                goToAccount();
                 return true;
             case R.id.actionSearch:
                 startActivity(new Intent(MainActivity.this, FilterActivity.class));
@@ -177,6 +152,33 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction fragTras = getSupportFragmentManager().beginTransaction();
         fragTras.replace(R.id.mainContainer, fragment);
         fragTras.commit();
+    }
+
+    public void goToAccount() {
+        startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+
+    }
+
+    private void getUserSettings() {
+        userItemRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+                if(documentSnapshot.exists()) {
+
+                    settings = Integer.parseInt(documentSnapshot.getString("notification_settings"));
+
+                } else {
+                    Toast.makeText(getApplicationContext(), "Document doesn't exist", Toast.LENGTH_SHORT).show();
+
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
     }
 
 }

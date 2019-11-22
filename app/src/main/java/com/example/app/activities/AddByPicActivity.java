@@ -77,7 +77,7 @@ public class AddByPicActivity extends AppCompatActivity implements View.OnClickL
         setContentView(R.layout.activity_add_by_pic);
 
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
-        setTitle("Add Food Item");
+        setTitle("Add with Photo");
 
         nameET = findViewById(R.id.nameET);
         expDateTV = findViewById(R.id.expdateTV);
@@ -91,11 +91,28 @@ public class AddByPicActivity extends AppCompatActivity implements View.OnClickL
 
         mQueue = Volley.newRequestQueue(this);
 
+        CropImage.activity()
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .setMinCropResultSize(512, 512)
+                .setAspectRatio(3, 2)
+                .start(AddByPicActivity.this);
+
+        mImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CropImage.activity()
+                        .setGuidelines(CropImageView.Guidelines.ON)
+                        .setMinCropResultSize(512, 512)
+                        .setAspectRatio(3, 2)
+                        .start(AddByPicActivity.this);
+            }
+        });
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.add_or_edit_menu, menu);
+        getMenuInflater().inflate(R.menu.filter_menu, menu);
         return true;
     }
 
@@ -103,12 +120,8 @@ public class AddByPicActivity extends AppCompatActivity implements View.OnClickL
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
 
-            case R.id.action_gallery:
-                CropImage.activity()
-                        .setGuidelines(CropImageView.Guidelines.ON)
-                        .setMinCropResultSize(512, 512)
-                        .setAspectRatio(3, 2)
-                        .start(AddByPicActivity.this);
+            case R.id.action_refresh:
+                startActivity(new Intent(this, AddByPicActivity.class));
                 break;
         }
 
@@ -134,6 +147,7 @@ public class AddByPicActivity extends AppCompatActivity implements View.OnClickL
                 saveItem();
                 break;
         }
+
     }
 
     private void showDatePicker() {
@@ -288,7 +302,7 @@ public class AddByPicActivity extends AppCompatActivity implements View.OnClickL
             System.out.println("Exception :" + e);
         }
 
-        itemRef.add(new Item(foodName, expDate, mAuth.getUid(), storageLocation, timestampDate));
+        itemRef.add(new Item(foodName, expDate, mAuth.getUid(), storageLocation, timestampDate, Timestamp.now()));
 
 
         Toast.makeText(getApplicationContext(), "Food Item Saved", Toast.LENGTH_SHORT).show();

@@ -9,16 +9,26 @@ public class Item {
     private String expdate;
     private String userID;
     private String storagelocation;
-    private Timestamp timestamp;
+    private Timestamp expTimestamp;
+    private Timestamp createdAt;
 
     public Item(){}
 
-    public Item(String name, String expdate, String userID, String storagelocation, Timestamp timestamp) {
+    public Item(String name, String expdate, String userID, String storagelocation, Timestamp expTimestamp, Timestamp createdAt) {
         this.name = name;
         this.expdate = expdate;
         this.userID = userID;
         this.storagelocation = storagelocation;
-        this.timestamp = timestamp;
+        this.expTimestamp = expTimestamp;
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
     }
 
     public String getName() {
@@ -53,11 +63,11 @@ public class Item {
         this.storagelocation = storagelocation;
     }
 
-    public Timestamp getTimestamp() {
-        return timestamp;
+    public Timestamp getExpTimestamp() {
+        return expTimestamp;
     }
 
-    public void setTimestamp(Timestamp timestamp) {
-        this.timestamp = timestamp;
+    public void setExpTimestamp(Timestamp expTimestamp) {
+        this.expTimestamp = expTimestamp;
     }
 }

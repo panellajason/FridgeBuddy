@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    cardCornerRadius="4dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
     android:layout_marginLeft="8dp"
+    android:layout_marginTop="8dp"
     android:layout_marginRight="8dp"
-    >
+    app:cardBackgroundColor="#E4D6D6"
+    app:cardCornerRadius="10dp">
 
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="#B4E6E7"
+        android:background="@drawable/rounded_cardview_blue"
         android:padding="8dp">
 
         <TextView
@@ -19,11 +21,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:layout_marginRight="5sp"
             android:layout_toLeftOf="@id/item_expdate"
             android:ellipsize="end"
             android:singleLine="true"
             android:text="Food Name"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textStyle="bold" />
 
 
         <TextView
@@ -33,11 +37,11 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
             android:text="DD/MM/YYYY"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="20sp"
+            android:textStyle="italic" />
 
     </RelativeLayout>
-
-
 
 
 </androidx.cardview.widget.CardView>

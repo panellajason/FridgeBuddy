@@ -49,8 +49,8 @@ public class ListFragment extends Fragment {
 
     private void setUpRecyclerView(View view) {
 
-        Query query = itemRef.orderBy("timestamp", Query.Direction.ASCENDING).whereEqualTo("userID", mAuth.getUid())
-                .whereGreaterThan("timestamp", new Timestamp(Calendar.getInstance().getTime()));
+        Query query = itemRef.orderBy("expTimestamp", Query.Direction.ASCENDING).whereEqualTo("userID", mAuth.getUid())
+                .whereGreaterThan("expTimestamp", Timestamp.now());
 
         FirestoreRecyclerOptions<Item> options = new FirestoreRecyclerOptions.Builder<Item>()
                 .setQuery(query, Item.class)
@@ -84,6 +84,7 @@ public class ListFragment extends Fragment {
                 String name = documentSnapshot.toObject(Item.class).getName();
                 String expDate = documentSnapshot.toObject(Item.class).getExpdate();
                 String storageLocation = documentSnapshot.toObject(Item.class).getStoragelocation();
+                String createdAt = documentSnapshot.toObject(Item.class).getCreatedAt().toDate().toString();
 
                 Intent i = new Intent(getActivity(), EditActivity.class);
 
@@ -91,6 +92,7 @@ public class ListFragment extends Fragment {
                 i.putExtra("NAME", name);
                 i.putExtra("EXP_DATE", expDate);
                 i.putExtra("STORAGE_LOCATION", storageLocation);
+                i.putExtra("CREATED_AT", createdAt);
 
                 startActivity(i);
             }

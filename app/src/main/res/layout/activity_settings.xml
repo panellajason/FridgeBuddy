@@ -4,20 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#E4D6D6"
-
-
-    tools:context=".fragments.AccountFragment">
+    tools:context=".activities.SettingsActivity">
 
     <Button
         android:id="@+id/accountSave"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
-        android:background="#E61509"
+        android:background="@drawable/rounded_button_red"
         android:text="Save Settings"
         android:textAllCaps="false"
         android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.6"

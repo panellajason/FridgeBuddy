@@ -33,6 +33,8 @@ public class AddFragment extends Fragment {
         picBtn = view.findViewById(R.id.addByPicBtn);
         manualBtn = view.findViewById(R.id.addManuallyBTN);
 
+        getActivity().setTitle("Choose a method");
+
         picBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

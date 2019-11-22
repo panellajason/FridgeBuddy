@@ -25,12 +25,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="0dp"
-            android:layout_marginBottom="40dp"
+            android:layout_marginBottom="60sp"
             android:ems="10"
-            android:hint="Food Name"
+            android:hint="Name of food item"
             android:inputType="textPersonName"
             android:maxLength="50"
             android:maxLines="1"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -38,7 +39,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginBottom="40dp"
+            android:layout_marginBottom="60sp"
             android:orientation="horizontal">
 
             <TextView
@@ -47,14 +48,20 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Expiration Date:"
-                android:textSize="18dp" />
+                android:textColor="#000000"
+                android:textSize="18dp"
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/man_chooseDateBtn"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_width="wrap_content"
+                android:layout_height="30sp"
                 android:layout_marginLeft="20dp"
-                android:text="Choose Date" />
+                android:background="@drawable/rounded_button_blue"
+                android:text="Choose Date"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <RadioGroup
@@ -70,29 +77,44 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="Refrigerator" />
+                android:text="Refrigerator"
+                android:textColor="#000000"
+                android:textStyle="bold" />
 
             <RadioButton
                 android:id="@+id/man_freezerBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Freezer" />
+                android:text="Freezer"
+                android:textColor="#000000"
+                android:textStyle="bold" />
 
             <RadioButton
                 android:id="@+id/man_cabinetBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Cabinet" />
+                android:text="Cabinet"
+                android:textColor="#000000"
+                android:textStyle="bold" />
 
         </RadioGroup>
 
-        <Button
-            android:id="@+id/man_saveBtn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#E61509"
-            android:text="Save"
-            android:textColor="#FFFFFF" />
-
     </LinearLayout>
+
+    <Button
+        android:id="@+id/man_saveBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10sp"
+        android:background="@drawable/rounded_button_red"
+        android:text="Save item to Food List"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintVertical_bias="0.52" />
 </androidx.constraintlayout.widget.ConstraintLayout>

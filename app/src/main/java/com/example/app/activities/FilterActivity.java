@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -22,13 +21,12 @@ import com.example.app.R;
 import com.example.app.models.Item;
 import com.example.app.models.ItemAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.theartofdev.edmodo.cropper.CropImage;
-import com.theartofdev.edmodo.cropper.CropImageView;
 
 public class FilterActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -72,11 +70,11 @@ public class FilterActivity extends AppCompatActivity implements AdapterView.OnI
     private void stringSearch (String search, String spinner) {
         Query query;
         if(spinner.trim().isEmpty() && search.trim().isEmpty())
-            query = itemRef.orderBy("timestamp", Query.Direction.ASCENDING).whereEqualTo("userID", mAuth.getUid());
+            query = itemRef.orderBy("expTimestamp", Query.Direction.ASCENDING).whereEqualTo("userID", mAuth.getUid());
         else if(spinner.trim().isEmpty())
             query = itemRef.orderBy("name", Query.Direction.ASCENDING).startAt(search).endAt(search + "\uf8ff").whereEqualTo("userID", mAuth.getUid());
         else if(search.trim().isEmpty())
-            query = itemRef.orderBy("timestamp", Query.Direction.ASCENDING).whereEqualTo("userID", mAuth.getUid()).whereEqualTo("storagelocation", spinner);
+            query = itemRef.orderBy("expTimestamp", Query.Direction.ASCENDING).whereEqualTo("userID", mAuth.getUid()).whereEqualTo("storagelocation", spinner);
         else
             query = itemRef.orderBy("name", Query.Direction.ASCENDING).whereEqualTo("userID", mAuth.getUid()).whereEqualTo("storagelocation", spinner).startAt(search).endAt(search + "\uf8ff");
 
@@ -114,6 +112,7 @@ public class FilterActivity extends AppCompatActivity implements AdapterView.OnI
                 String name = documentSnapshot.toObject(Item.class).getName();
                 String expDate = documentSnapshot.toObject(Item.class).getExpdate();
                 String storageLocation = documentSnapshot.toObject(Item.class).getStoragelocation();
+                String createdAt = documentSnapshot.toObject(Item.class).getCreatedAt().toDate().toString();
 
                 Intent i = new Intent(FilterActivity.this, EditActivity.class);
 
@@ -121,6 +120,7 @@ public class FilterActivity extends AppCompatActivity implements AdapterView.OnI
                 i.putExtra("NAME", name);
                 i.putExtra("EXP_DATE", expDate);
                 i.putExtra("STORAGE_LOCATION", storageLocation);
+                i.putExtra("CREATED_AT", createdAt);
 
                 startActivity(i);
             }
