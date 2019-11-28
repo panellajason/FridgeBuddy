@@ -1,8 +1,6 @@
 package com.example.app.activities;
 
 import android.content.Intent;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -10,7 +8,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import com.example.app.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -26,7 +25,7 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressBar progressBar;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
@@ -39,27 +38,26 @@ public class LoginActivity extends AppCompatActivity {
         registerBTN = (Button) findViewById(R.id.goToRegisterBTN);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
-
         loginBTN.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(final View v) {
 
-                String email = emailET.getText().toString();
-                String password = passwordET.getText().toString();
+                final String email = emailET.getText().toString();
+                final String password = passwordET.getText().toString();
 
-                if(!(TextUtils.isEmpty(email)) && !(TextUtils.isEmpty(password))) {
+                if (!(TextUtils.isEmpty(email)) && !(TextUtils.isEmpty(password))) {
 
                     progressBar.setVisibility(View.VISIBLE);
 
                     mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if(task.isSuccessful()) {
+                        public void onComplete(@NonNull final Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
 
                                 sendToMain();
                             } else {
 
-                                String errorMess = task.getException().getMessage();
+                                final String errorMess = task.getException().getMessage();
                                 Toast.makeText(LoginActivity.this, "Error: " + errorMess, Toast.LENGTH_SHORT).show();
                             }
 
@@ -73,8 +71,8 @@ public class LoginActivity extends AppCompatActivity {
 
         registerBTN.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Intent i = new Intent(LoginActivity.this, RegisterActivity.class);
+            public void onClick(final View v) {
+                final Intent i = new Intent(LoginActivity.this, RegisterActivity.class);
                 startActivity(i);
                 finish();
             }
@@ -86,16 +84,16 @@ public class LoginActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        FirebaseUser user = mAuth.getCurrentUser();
+        final FirebaseUser user = mAuth.getCurrentUser();
 
-        if(user != null) {
+        if (user != null) {
 
             sendToMain();
         }
     }
 
     private void sendToMain() {
-        Intent i = new Intent(LoginActivity.this, MainActivity.class);
+        final Intent i = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(i);
         finish();
     }

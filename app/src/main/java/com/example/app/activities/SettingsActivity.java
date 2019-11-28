@@ -1,8 +1,5 @@
 package com.example.app.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -12,7 +9,8 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import com.example.app.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -26,11 +24,13 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-
 import java.util.Calendar;
 
-public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
+public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
+    public static final String EXP_TIMESTAMP = "expTimestamp";
+    public static final String USER_ID = "userID";
+    public static final String NOTIFICATION_SETTINGS = "notification_settings";
     private Spinner spinner;
     private TextView totalItemsTV;
     private TextView expiredItemsTV;
@@ -43,12 +43,12 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     private CollectionReference itemRef = db.collection("Items");
     private CollectionReference itemRefSet = db.collection("User Settings");
 
-
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
         setTitle("Account Settings");
 
         totalItemsTV = findViewById(R.id.accountItemsNumber);
@@ -56,7 +56,8 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         saveButton = findViewById(R.id.accountSave);
         spinner = findViewById(R.id.accountSpinner);
 
-        ArrayAdapter<CharSequence> arrayAdapter = ArrayAdapter.createFromResource(this, R.array.account, android.R.layout.simple_spinner_item);
+        final ArrayAdapter<CharSequence> arrayAdapter = ArrayAdapter.createFromResource(this, R.array.account,
+                android.R.layout.simple_spinner_item);
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(arrayAdapter);
         spinner.setOnItemSelectedListener(this);
@@ -65,7 +66,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(final View v) {
 
                 saveSettings();
             }
@@ -74,8 +75,8 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     }
 
     @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        if(!(position == Integer.parseInt(spinnerTxt)))
+    public void onItemSelected(final AdapterView<?> parent, final View view, final int position, final long id) {
+        if (!(position == Integer.parseInt(spinnerTxt)))
             saveButton.setVisibility(View.VISIBLE);
         else
             saveButton.setVisibility(View.INVISIBLE);
@@ -83,15 +84,15 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> parent) {
+    public void onNothingSelected(final AdapterView<?> parent) {
 
     }
 
-    private void setQueries () {
-        Query query1 = itemRef.orderBy("expTimestamp", Query.Direction.ASCENDING).whereEqualTo("userID", mAuth.getUid());
+    private void setQueries() {
+        final Query query1 = itemRef.orderBy(EXP_TIMESTAMP, Query.Direction.ASCENDING).whereEqualTo(USER_ID, mAuth.getUid());
         query1.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+            public void onComplete(@NonNull final Task<QuerySnapshot> task) {
 
                 if (task.isSuccessful()) {
                     totalItemsTV.setText("Total Number of Food Items: " + task.getResult().size());
@@ -100,11 +101,11 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             }
         });
 
-        Query query2 = itemRef.orderBy("expTimestamp", Query.Direction.ASCENDING).whereEqualTo("userID", mAuth.getUid())
-                .whereLessThan("expTimestamp", new Timestamp(Calendar.getInstance().getTime()));
+        final Query query2 = itemRef.orderBy(EXP_TIMESTAMP, Query.Direction.ASCENDING).whereEqualTo(USER_ID, mAuth.getUid())
+                .whereLessThan(EXP_TIMESTAMP, new Timestamp(Calendar.getInstance().getTime()));
         query2.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+            public void onComplete(@NonNull final Task<QuerySnapshot> task) {
 
                 if (task.isSuccessful()) {
                     expiredItemsTV.setText("Total Number of Expired Food Items: " + task.getResult().size());
@@ -114,9 +115,9 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
 
         userItemRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
+            public void onSuccess(final DocumentSnapshot documentSnapshot) {
 
-                if(documentSnapshot.exists()) {
+                if (documentSnapshot.exists()) {
 
                     spinner.setSelection(Integer.parseInt(documentSnapshot.getString("notification_settings")));
                     spinnerTxt = spinner.getSelectedItem().toString();
@@ -125,7 +126,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
-            public void onFailure(@NonNull Exception e) {
+            public void onFailure(@NonNull final Exception e) {
                 startActivity(new Intent(SettingsActivity.this, MainActivity.class));
             }
         });
@@ -134,20 +135,18 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
 
     private void saveSettings() {
 
+        if (!spinner.getSelectedItem().toString().equals(spinnerTxt)) {
 
-        if(!spinner.getSelectedItem().toString().equals(spinnerTxt)) {
-
-            itemRefSet.document(mAuth.getUid()).update("notification_settings", spinner.getSelectedItem().toString())
+            itemRefSet.document(mAuth.getUid()).update(NOTIFICATION_SETTINGS, spinner.getSelectedItem().toString())
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if(task.isSuccessful()) {
+                        public void onComplete(@NonNull final Task<Void> task) {
+                            if (task.isSuccessful()) {
                                 Toast.makeText(getApplicationContext(), "Account Settings Saved", Toast.LENGTH_SHORT).show();
                                 MainActivity.settings = Integer.parseInt(spinner.getSelectedItem().toString());
                                 startActivity(new Intent(SettingsActivity.this, MainActivity.class));
 
-                            }
-                            else {
+                            } else {
                                 Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_LONG).show();
                             }
                         }

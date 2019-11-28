@@ -13,7 +13,9 @@
         android:roundIcon="@drawable/fridge"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.SettingsActivity"></activity>
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:parentActivityName=".activities.MainActivity" />
         <activity
             android:name=".activities.AddManuallyActivity"
             android:parentActivityName=".activities.MainActivity" />

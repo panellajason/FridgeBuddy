@@ -69,7 +69,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
-        android:text="Change this"
+        android:text="(Change this)"
         android:textColor="#2087DA"
         android:textSize="10sp"
         android:textStyle="bold"

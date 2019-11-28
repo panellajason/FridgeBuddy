@@ -1,20 +1,18 @@
 package com.example.app.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
-
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import com.example.app.R;
 import com.example.app.fragments.AddFragment;
 import com.example.app.fragments.ListFragment;
-import com.example.app.R;
 import com.example.app.fragments.NotificationsFragment;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -32,29 +30,27 @@ import com.google.firebase.firestore.FirebaseFirestore;
     -shopping list (user can highlight item if they have it)
  */
 
-
-
 public class MainActivity extends AppCompatActivity {
 
+    public static int settings;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private BottomNavigationView bottomNav;
     private Fragment listFragment;
     private Fragment addFragment;
-
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private DocumentReference userItemRef = db.document("User Settings/" + mAuth.getUid());
-    public static int settings;
-
+    private FirebaseFirestore db;
+    private DocumentReference userItemRef;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         setTitle("Food List");
 
+        if (mAuth.getCurrentUser() != null) {
 
-        if(mAuth.getCurrentUser() != null) {
+            db = FirebaseFirestore.getInstance();
+            userItemRef = db.document("User Settings/" + mAuth.getUid());
 
             getUserSettings();
 
@@ -67,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
             bottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                public boolean onNavigationItemSelected(@NonNull final MenuItem menuItem) {
 
                     switch (menuItem.getItemId()) {
 
@@ -78,9 +74,8 @@ public class MainActivity extends AppCompatActivity {
                             replaceFragment(addFragment);
                             return true;
                         case R.id.navNotifications:
-                             replaceFragment(new NotificationsFragment());
-                             return true;
-
+                            replaceFragment(new NotificationsFragment());
+                            return true;
 
                         default:
                             return false;
@@ -91,25 +86,23 @@ public class MainActivity extends AppCompatActivity {
             if (savedInstanceState == null) {
                 bottomNav.setSelectedItemId(R.id.navList);
             }
-        }
-        else {
+        } else {
             sendToLogin();
         }
 
     }
 
-
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        final MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(final MenuItem item) {
 
-        switch(item.getItemId()) {
+        switch (item.getItemId()) {
             case R.id.actionLogout:
                 logout();
                 return true;
@@ -133,8 +126,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        FirebaseUser user = mAuth.getCurrentUser();
-        if(user == null) {
+        final FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null) {
 
             sendToLogin();
         }
@@ -148,10 +141,10 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
-    public void replaceFragment(Fragment fragment) {
-        FragmentTransaction fragTras = getSupportFragmentManager().beginTransaction();
-        fragTras.replace(R.id.mainContainer, fragment);
-        fragTras.commit();
+    public void replaceFragment(final Fragment fragment) {
+        final FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.mainContainer, fragment);
+        fragmentTransaction.commit();
     }
 
     public void goToAccount() {
@@ -162,9 +155,9 @@ public class MainActivity extends AppCompatActivity {
     private void getUserSettings() {
         userItemRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
+            public void onSuccess(final DocumentSnapshot documentSnapshot) {
 
-                if(documentSnapshot.exists()) {
+                if (documentSnapshot.exists()) {
 
                     settings = Integer.parseInt(documentSnapshot.getString("notification_settings"));
 
@@ -175,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
-            public void onFailure(@NonNull Exception e) {
+            public void onFailure(@NonNull final Exception e) {
 
             }
         });

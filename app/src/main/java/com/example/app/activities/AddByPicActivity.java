@@ -1,13 +1,10 @@
 package com.example.app.activities;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,17 +16,17 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.net.Uri;
-
-
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.app.models.Item;
 import com.example.app.R;
+import com.example.app.models.Item;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -45,19 +42,19 @@ import com.google.firebase.ml.vision.text.FirebaseVisionText;
 import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class AddByPicActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener {
 
+    public static final String PRODUCT = "product";
+    public static final String PRODUCT_NAME = "product_name";
     private Bitmap mBitmap = null;
     private ImageView mImageView;
     private EditText nameET;
@@ -70,9 +67,8 @@ public class AddByPicActivity extends AppCompatActivity implements View.OnClickL
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference itemRef = db.collection("Items");
 
-
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_by_pic);
 
@@ -99,7 +95,7 @@ public class AddByPicActivity extends AppCompatActivity implements View.OnClickL
 
         mImageView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(final View v) {
                 CropImage.activity()
                         .setGuidelines(CropImageView.Guidelines.ON)
                         .setMinCropResultSize(512, 512)
@@ -111,13 +107,13 @@ public class AddByPicActivity extends AppCompatActivity implements View.OnClickL
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.filter_menu, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
 
             case R.id.action_refresh:
@@ -129,7 +125,7 @@ public class AddByPicActivity extends AppCompatActivity implements View.OnClickL
     }
 
     @Override
-    public void onClick(View view) {
+    public void onClick(final View view) {
 
         switch (view.getId()) {
             case R.id.textRecBtn:
@@ -151,7 +147,7 @@ public class AddByPicActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void showDatePicker() {
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, this, Calendar.getInstance().get(Calendar.YEAR),
+        final DatePickerDialog datePickerDialog = new DatePickerDialog(this, this, Calendar.getInstance().get(Calendar.YEAR),
                 Calendar.getInstance().get(Calendar.MONTH),
                 Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
         );
@@ -161,72 +157,72 @@ public class AddByPicActivity extends AppCompatActivity implements View.OnClickL
     private void runTextRecognition() {
         if (mBitmap != null) {
 
-            FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(mBitmap);
+            final FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(mBitmap);
 
-            FirebaseVisionTextRecognizer detector = FirebaseVision.getInstance().getOnDeviceTextRecognizer();
+            final FirebaseVisionTextRecognizer detector = FirebaseVision.getInstance().getOnDeviceTextRecognizer();
 
             detector.processImage(image).addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
                 @Override
-                public void onSuccess(FirebaseVisionText firebaseVisionText) {
+                public void onSuccess(final FirebaseVisionText firebaseVisionText) {
 
                     if (firebaseVisionText.getTextBlocks().size() == 0) {
                         nameET.setText("No text");
                         return;
                     }
 
-                    for (FirebaseVisionText.TextBlock block : firebaseVisionText.getTextBlocks()) {
+                    for (final FirebaseVisionText.TextBlock block : firebaseVisionText.getTextBlocks()) {
 
-                        for (FirebaseVisionText.Line line : block.getLines()) {
+                        for (final FirebaseVisionText.Line line : block.getLines()) {
                             nameET.append(line.getText() + "\n");
                         }
                     }
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
-                public void onFailure(@NonNull Exception exception) {
+                public void onFailure(@NonNull final Exception exception) {
                     exception.printStackTrace();
                 }
             });
-        }
-        else {
+        } else {
             Toast.makeText(getApplicationContext(), "Please select an image", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void runBarcodeScanner() {
         if (mBitmap != null) {
-            FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(mBitmap);
+            final FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(mBitmap);
 
-            FirebaseVisionBarcodeDetector detector = FirebaseVision.getInstance()
+            final FirebaseVisionBarcodeDetector detector = FirebaseVision.getInstance()
                     .getVisionBarcodeDetector();
 
-            Task<List<FirebaseVisionBarcode>> result = detector.detectInImage(image)
+            final Task<List<FirebaseVisionBarcode>> result = detector.detectInImage(image)
                     .addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionBarcode>>() {
                         @Override
-                        public void onSuccess(List<FirebaseVisionBarcode> barcodes) {
+                        public void onSuccess(final List<FirebaseVisionBarcode> barcodes) {
 
-                            if (barcodes.size() != 0) {
-                                for (FirebaseVisionBarcode barcode : barcodes) {
+                            if (!barcodes.isEmpty()) {
+                                for (final FirebaseVisionBarcode barcode : barcodes) {
 
-                                    String rawValue = barcode.getRawValue();
+                                    final String rawValue = barcode.getRawValue();
 
-                                    String url = "https://world.openfoodfacts.org/api/v0/product/" + rawValue + ".json";
+                                    final String url = "https://world.openfoodfacts.org/api/v0/product/" + rawValue + ".json";
 
-                                    final JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,                new Response.Listener<JSONObject>() {
+                                    final JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
+                                            new Response.Listener<JSONObject>() {
                                         @Override
-                                        public void onResponse(JSONObject response) {
+                                        public void onResponse(final JSONObject response) {
                                             try {
-                                                String foodName = response.getJSONObject("product").getString("product_name");
+                                                final String foodName = response.getJSONObject(PRODUCT).getString(PRODUCT_NAME);
                                                 nameET.setText(foodName);
 
-                                            } catch (JSONException e) {
+                                            } catch (final JSONException e) {
 
                                                 nameET.setText(e.getMessage());
                                             }
                                         }
                                     }, new Response.ErrorListener() {
                                         @Override
-                                        public void onErrorResponse(VolleyError error) {
+                                        public void onErrorResponse(final VolleyError error) {
                                             error.printStackTrace();
                                         }
                                     });
@@ -240,7 +236,7 @@ public class AddByPicActivity extends AppCompatActivity implements View.OnClickL
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
-                        public void onFailure(@NonNull Exception e) {
+                        public void onFailure(@NonNull final Exception e) {
                             e.printStackTrace();
                         }
                     });
@@ -251,10 +247,10 @@ public class AddByPicActivity extends AppCompatActivity implements View.OnClickL
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data) {
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            final CropImage.ActivityResult result = CropImage.getActivityResult(data);
 
             if (resultCode == RESULT_OK) {
 
@@ -262,11 +258,11 @@ public class AddByPicActivity extends AppCompatActivity implements View.OnClickL
                 mImageView.setImageURI(postURI);
 
                 mImageView.invalidate();
-                BitmapDrawable drawable = (BitmapDrawable) mImageView.getDrawable();
+                final BitmapDrawable drawable = (BitmapDrawable) mImageView.getDrawable();
                 mBitmap = drawable.getBitmap();
 
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                Exception error = result.getError();
+                final Exception error = result.getError();
             }
         }
 
@@ -275,16 +271,21 @@ public class AddByPicActivity extends AppCompatActivity implements View.OnClickL
 
     private void saveItem() {
 
-        int selectedID = radioGroup.getCheckedRadioButtonId();
-        RadioButton selectedRadioButton = findViewById(selectedID);
-        String storageLocation = selectedRadioButton.getText().toString();
-        String foodName = nameET.getText().toString();
-        String expDate = expDateTV.getText().toString();
+        final int selectedID = radioGroup.getCheckedRadioButtonId();
+        final RadioButton selectedRadioButton = findViewById(selectedID);
+        final String storageLocation = selectedRadioButton.getText().toString();
+        final String foodName = nameET.getText().toString();
+        final String expDate = expDateTV.getText().toString();
 
         if (foodName.trim().isEmpty()) {
             Toast.makeText(getApplicationContext(), "Please enter a food name", Toast.LENGTH_LONG).show();
             return;
         }
+
+//
+//        Intent intent = new Intent(this, MainActivity.class);
+//        final int alarm = Integer.parseInt(Timestamp.now().toString());
+//        PendingIntent intent2 = PendingIntent.getBroadcast(this, alarm,intent,0);
 
         if (expDate.equals("Expiration Date:")) {
             Toast.makeText(getApplicationContext(), "Please enter an expiration date", Toast.LENGTH_LONG).show();
@@ -294,23 +295,22 @@ public class AddByPicActivity extends AppCompatActivity implements View.OnClickL
         Timestamp timestampDate = new Timestamp(new Date());
         try {
 
-            DateFormat formatter;
+            final DateFormat formatter;
             formatter = new SimpleDateFormat("MM/dd/yyyy");
-            Date date = formatter.parse(expDate);
+            final Date date = formatter.parse(expDate);
             timestampDate = new Timestamp(date);
-        } catch (ParseException e) {
-            System.out.println("Exception :" + e);
+        } catch (final ParseException e) {
+
         }
 
         itemRef.add(new Item(foodName, expDate, mAuth.getUid(), storageLocation, timestampDate, Timestamp.now()));
-
 
         Toast.makeText(getApplicationContext(), "Food Item Saved", Toast.LENGTH_SHORT).show();
         startActivity(new Intent(AddByPicActivity.this, MainActivity.class));
     }
 
     @Override
-    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+    public void onDateSet(final DatePicker view, final int year, int month, final int dayOfMonth) {
         expDateTV.setText(++month + "/" + dayOfMonth + "/" + year);
 
     }

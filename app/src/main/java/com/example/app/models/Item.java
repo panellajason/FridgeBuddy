@@ -1,6 +1,5 @@
 package com.example.app.models;
 
-
 import com.google.firebase.Timestamp;
 
 public class Item {
@@ -12,9 +11,10 @@ public class Item {
     private Timestamp expTimestamp;
     private Timestamp createdAt;
 
-    public Item(){}
+    public Item() {}
 
-    public Item(String name, String expdate, String userID, String storagelocation, Timestamp expTimestamp, Timestamp createdAt) {
+    public Item(final String name, final String expdate, final String userID, final String storagelocation, final Timestamp expTimestamp,
+                final Timestamp createdAt) {
         this.name = name;
         this.expdate = expdate;
         this.userID = userID;
@@ -27,7 +27,7 @@ public class Item {
         return createdAt;
     }
 
-    public void setCreatedAt(Timestamp createdAt) {
+    public void setCreatedAt(final Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -35,7 +35,7 @@ public class Item {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -43,7 +43,7 @@ public class Item {
         return expdate;
     }
 
-    public void setExpdate(String expdate) {
+    public void setExpdate(final String expdate) {
         this.expdate = expdate;
     }
 
@@ -51,7 +51,7 @@ public class Item {
         return userID;
     }
 
-    public void setUserID(String userID) {
+    public void setUserID(final String userID) {
         this.userID = userID;
     }
 
@@ -59,7 +59,7 @@ public class Item {
         return storagelocation;
     }
 
-    public void setStoragelocation(String storagelocation) {
+    public void setStoragelocation(final String storagelocation) {
         this.storagelocation = storagelocation;
     }
 
@@ -67,7 +67,7 @@ public class Item {
         return expTimestamp;
     }
 
-    public void setExpTimestamp(Timestamp expTimestamp) {
+    public void setExpTimestamp(final Timestamp expTimestamp) {
         this.expTimestamp = expTimestamp;
     }
 }

@@ -150,7 +150,7 @@
             android:layout_margin="10sp"
             android:layout_marginBottom="16dp"
             android:background="@drawable/rounded_button_red"
-            android:text="Save item to Food List"
+            android:text="Save to Food List"
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
             android:textStyle="bold" />
